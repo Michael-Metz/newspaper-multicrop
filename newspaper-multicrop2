@@ -1,0 +1,161 @@
+#!/bin/bash
+#
+# Developed by Michael Metz 8/10/2017
+#
+# ------------------------------------------------------------------------------
+#
+# This script is built on top of Fred Weinhaus mulitcrop script.
+# Fred website is http://www.fmwconcepts.com/imagemagick/
+# The liscense for multicrop2 applies as seen below.
+#
+# Licensing:
+#
+# Copyright © Fred Weinhaus
+#
+# My scripts are available free of charge for non-commercial use, ONLY.
+#
+# For use of my scripts in commercial (for-profit) environments or
+# non-free applications, please contact me (Fred Weinhaus) for
+# licensing arrangements. My email address is fmw at alink dot net.
+#
+# If you: 1) redistribute, 2) incorporate any of these scripts into other
+# free applications or 3) reprogram them in another scripting language,
+# then you must contact me for permission, especially if the result might
+# be used in a commercial or for-profit environment.
+#
+# This script is also subject, in a subordinate manner, to the ImageMagick
+# license, which can be found at: http://www.imagemagick.org/script/license.php
+#
+# ------------------------------------------------------------------------------
+#
+####
+#
+# USAGE: newspaper-multicrop2 [image] [image_mask] [discard-value]
+#
+# ARGUMENTS:
+
+# image          -  image that contains multiple newspaper clips
+# image_mask     -  mask of image^ (use photoshop,gimp or multicrop2 to make)
+# discard-value  -  Integer value passed to multicrop2. High values i.e 10
+#                Low values i.e 4 will take longer to process but will
+#                find large and smaller news clippings.
+#                [0 < dv]
+
+#
+# NOTE: This script depends on multicrop2 and imagemagick. Make sure both
+# are installed be trying to run this script.
+#
+#
+######
+#
+
+#validate arguments
+usage()
+{
+  echo "------------------------------------------------------------"
+  echo "USAGE: newspaper-multicrop2 [image] [image_mask] [discard-value]"
+  echo ""
+  echo "ARGUMENTS"; echo ""
+  echo "image          -  image that contains multiple newspaper clips"
+  echo "image_mask     -  mask of image^ (use photoshop,gimp or multicrop to make)"
+  echo "discard-value  -  Integer value passed to multicrop2. Indicates the"
+  echo "                  minimumn pixel value that you want to keep."
+  echo "                  ex. a value of 300 will discard any images found"
+  echo "                  that are under 300 pixels"
+  echo "                  [0 < dv]"
+  echo ""
+  echo "$1"
+  exit 0
+}
+#make sure there is three arguments
+if [ $# -ne 3 ]; then
+  usage "newspaper-multicrop2 expects 3 arguments. you passed $#"
+fi
+
+#make sure files are validate
+if [ -s "$1" ]; then
+  true #^find a way to negate this
+else
+  usage "$1 is not a valid image"
+fi
+
+if [ -s "$2" ]; then
+  true #^find a way to negate this
+else
+  usage "$2 is not a valid image mask"
+fi
+
+#validate discard value
+case ${3#[-+]} in
+  *[!0-9]* | '') usage  "discard value must be an integer"; exit 0 ;;
+  *) if [ "$3" -le 0 ]; then
+      usage  "discard value must be an integer greater than 0"
+  fi ;;
+esac
+#at this point discard value is valid and 3 parameters are valid
+
+#stats
+starttime=$(date +%s)
+
+#initialize Varibles
+verbose="true"
+imageFile="$1"
+imageMaskFile="$2"
+discard="$3"
+#extract filename
+fullFileName=$(basename "$imageFile") #with extension
+filename="${fullFileName##*/}" #last part of path
+filename="${filename%.*}" # chop off extension
+
+#create directorys
+tempDir="$filename"_temp
+cropDir="$filename"_cropped #created later
+mkdir "$tempDir"
+
+
+function finish {
+  rm -rf "$tempDir"
+}
+trap finish EXIT
+#trap "rm -rf $tempDir; exit 1" 1 2 3 15
+
+#Apply image mask
+composite -compose CopyOpacity $imageMaskFile $imageFile "$tempDir"/raw-masked.png
+
+#MulitCrop newspaper clippings
+cd "$tempDir"
+if [[ "$verbose" = false ]]; then
+  multicrop2 -b "rgba(0,0,0,0)" -f 1 -d "$discard" -u 3 - raw-masked.png temp.png >/dev/null 2>&1
+else
+  multicrop2 -b "rgba(0,0,0,0)" -f 1 -d "$discard" -u 3 raw-masked.png temp.png
+fi
+
+rm raw-masked.png
+
+#deskew using imagemagick built in deskew
+mogrify -deskew 40% *.png
+
+#replace white border(left by deskew) to alpha
+mogrify -bordercolor white -border 1x1 -alpha set -channel RGBA -fuzz 1% -fill none -floodfill +0+0 white -shave 1x1 *.png
+
+cd ../
+
+#Use imagemagick to get rid of any extra Alpha Border. (on all images)
+mkdir "$cropDir"
+cd "$cropDir"
+
+convert -bordercolor none -border 10x10 -trim +repage ../"$tempDir"/*.png out.png
+
+#Make file cropped names look nice
+i=0
+for file in *; do
+  mv "$file" "$filename"-$(printf "%02d" $i).png
+  i=$((i + 1))
+done
+totalCrops=$((i))
+cd ../
+
+#output stats
+endtime=`date +%s`
+
+echo "$fullFileName cropped into $totalCrops in $((endtime - starttime)) seconds"
