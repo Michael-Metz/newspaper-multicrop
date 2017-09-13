@@ -17,6 +17,8 @@ The scripts are built on top of *[imagemagick](https://www.imagemagick.org/scrip
 <a name="license"></a>
 # License
 Use of newspaper-multicrop and newspaper-multicrop2 are subject, in a subordinate manner, to Fred Weinhaus's license which can be found at [http://www.fmwconcepts.com/imagemagick/](http://www.fmwconcepts.com/imagemagick/) and to the ImageMagick's license, which can be found at: [http://www.imagemagick.org/script/license.php](http://www.imagemagick.org/script/license.php)
+
+**Freds scripts require licensing for commercial use. Therefore if you plan on using newspaper-multicrop, newspaper-multicrop2, multicrop, or mulitcrop2, commercially then you MUST contact [Fred](http://www.fmwconcepts.com/imagemagick/)**
 <a name="setup-and-installation"></a>
 # Set Up & Installation
 > The following installation instructions are done under the ubunutu 16.04 operating system
@@ -33,7 +35,7 @@ $ sudo apt install imagemagick
 ```sh
 $ mkdir -p $HOME/bin/fredscripts
 ```
-##### Download the scripts from [freds website](http://www.fmwconcepts.com/imagemagick) ([mulitcrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php), [multicrop2](http://www.fmwconcepts.com/imagemagick/multicrop2/index.php)) and move them to `$HOME/bin/fredscrits`
+##### Download the scripts from [freds website](http://www.fmwconcepts.com/imagemagick) ([mulitcrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php), [multicrop2](http://www.fmwconcepts.com/imagemagick/multicrop2/index.php)) and move them to `$HOME/bin/fredscripts`
 ```sh
 $ # Download the scripts
 $ wget http://www.fmwconcepts.com/imagemagick/multicrop/multicrop
@@ -103,7 +105,7 @@ To save and exit the text editor, type `ctrl + x` followed by `y` then hit retur
 
 # Usage
 ### newspaper-multicrop 
-newspaper-multicrop requires 3 parameters
+newspaper-multicrop seperates images using multicrop and requires 3 parameters
 
 1. image
 2. image mask (See *[Creating a Mask](#create-a-mask)* )
@@ -113,10 +115,10 @@ newspaper-multicrop requires 3 parameters
 $ #newspaper-multicrop [image] [image mask] [grid value]
 $ newspaper-multicrop clippings.tif clippings_mask.png 10
 ```
-newspaper seperates images using multicrop
+
 
 ### newspaper-multicrop2
-newspaper-multicrop requires 3 parameters
+newspaper-multicrop2 seperates images using multicrop2 and requires requires 3 parameters
 
 1. image
 2. image mask (See *[Creating a Mask](#create-a-mask)* )
@@ -126,7 +128,6 @@ newspaper-multicrop requires 3 parameters
 $ #newspaper-multicrop2 [image] [image mask] [discard value]
 $ newspaper-multicrop2 clippings.tif clippings_mask.png 800
 ```
-newspaper seperates images using multicrop2
 
 <a name="differences"></a>
 # Differences
@@ -177,13 +178,43 @@ Masks indicate what parts of the image is a newspaper clippings and what part is
 
 #### With Multicrop
 ```sh
-$ mulitcrop -f 15 -p 5 -m output raw-scan.tif
+$ mulitcrop -f 15 -p 5 -m output image.tif
 ```
 The flag values `-f 15` & `-p 5`  work for my test scans. Reading the documentation for [multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php) will help different cases
 
 <a name="what-exactly-the-script-does"></a>
 
 ## 3.Running the scripts
+Say you have `image.tif` that contains 5 news clipping
+
+you've created a mask for it `image_mask.gif`
+
+you've put both of this files in a folder `my-scans` 
+
+```
++---my-scans
+    +--image.tif
+    +--image_mask.gif
+```
+
+Running the following command in `my-scans` directory
+
+```sh
+$ newspaper-multicrop image.tif image_mask.gif 10
+```
+The script will do its thing and create a directory `image_cropped` to store all the crops
+
+```
++---folder-of-stuff
+    +--image.jpg
+    +--image_mask.gif
+    +--image_cropped
+       +--image-00.png
+       +--image-01.png
+       +--image-02.png
+       +--image-03.png
+       +--image-04.png
+```
 
 # What the scripts does
 1. Applys image mask to raw image creating a image with a transparent background
