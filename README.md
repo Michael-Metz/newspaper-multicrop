@@ -14,6 +14,11 @@ newspaper-multicrop and newspaper-multicrop2 are bash shell scripts that creates
 The scripts are built on top of *[imagemagick](https://www.imagemagick.org/script/index.php)* along with [freds weihaus's](http://www.fmwconcepts.com/imagemagick/),  *[multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php)* and *[multicrop2](http://www.fmwconcepts.com/imagemagick/multicrop2/index.php)* scripts
 ![Imgur](https://i.imgur.com/zsHbr5E.gif)
 
+newspaper-multicrop and newspaper-multicrop2 differ from multicrop and multicrop2 in the following ways
+
+1. You can use a custom mask, instead of having multicrop generate a mask
+2. Borders are left transparent instead of white
+ 
 <a name="license"></a>
 # License
 Use of newspaper-multicrop and newspaper-multicrop2 are subject, in a subordinate manner, to Fred Weinhaus's license which can be found at [http://www.fmwconcepts.com/imagemagick/](http://www.fmwconcepts.com/imagemagick/) and to the ImageMagick's license, which can be found at: [http://www.imagemagick.org/script/license.php](http://www.imagemagick.org/script/license.php)
@@ -135,7 +140,7 @@ $ newspaper-multicrop2 clippings.tif clippings_mask.png 800
 
 **newspaper-multicrop2** splits images using **multicrop2**
 
-###multicrop vs multicrop2
+### multicrop vs multicrop2
 
 
 
@@ -182,7 +187,6 @@ $ mulitcrop -f 15 -p 5 -m output image.tif
 ```
 The flag values `-f 15` & `-p 5`  work for my test scans. Reading the documentation for [multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php) will help different cases
 
-<a name="what-exactly-the-script-does"></a>
 
 ## 3.Running the scripts
 Say you have `image.tif` that contains 5 news clipping
@@ -215,6 +219,8 @@ The script will do its thing and create a directory `image_cropped` to store all
        +--image-03.png
        +--image-04.png
 ```
+
+<a name="what-exactly-the-script-does"></a>
 
 # What the scripts does
 1. Applys image mask to raw image creating a image with a transparent background
