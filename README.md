@@ -9,7 +9,7 @@
 
 <a name="introduction"></a>
 # Introduction
-newspaper-multicrop and newspaper-multicrop2 are bash shell scripts that creates transparent crops from a scanned image that contains multiple newspaper clippings
+newspaper-multicrop and newspaper-multicrop2 are bash shell scripts that create transparent crops, from a scanned image, that contain multiple newspaper clippings.
 
 The scripts are built on top of *[imagemagick](https://www.imagemagick.org/script/index.php)* along with [freds weihaus's](http://www.fmwconcepts.com/imagemagick/),  *[multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php)* and *[multicrop2](http://www.fmwconcepts.com/imagemagick/multicrop2/index.php)* scripts
 ![Imgur](https://i.imgur.com/zsHbr5E.gif)
