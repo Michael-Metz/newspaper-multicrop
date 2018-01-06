@@ -53,7 +53,7 @@
 usage()
 {
   echo "------------------------------------------------------------"
-  echo "USAGE: newspaper-multicrop2 [image] [image_mask] [discard-value]"
+  echo "USAGE: newspaper-multicrop2 [image] [image_mask] [discard-value] [deskew-method]"
   echo ""
   echo "ARGUMENTS"; echo ""
   echo "image          -  image that contains multiple newspaper clips"
@@ -64,11 +64,15 @@ usage()
   echo "                  that are under 300 pixels"
   echo "                  [0 < dv]"
   echo ""
+  echo "deskew-method - indicate deskew method number either 0 or 1."
+  echo "                 0: deskew; image magicks built in deskew"
+  echo "                 1: textdeskew; Fred Weinhaus script must be installed"
+  echo ""
   echo "$1"
   exit 0
 }
 #make sure there is three arguments
-if [ $# -ne 3 ]; then
+if [ $# -ne 4 ]; then
   usage "newspaper-multicrop2 expects 3 arguments. you passed $#"
 fi
 
@@ -92,7 +96,15 @@ case ${3#[-+]} in
       usage  "discard value must be an integer greater than 0"
   fi ;;
 esac
-#at this point discard value is valid and 3 parameters are valid
+
+#validate select-deskew
+case ${4#[-+]} in
+  *[!0-9]* | '') usage  "deskew-method must be an integer"; exit 0 ;;
+  *) if [ "$4" -ne 0 ] && [ "$4" -ne 1 ]; then
+      usage  "deskew-method must be an integer, either 0 or 1"
+  fi ;;
+esac
+#at this point discard value is valid and 4 parameters are valid
 
 #stats
 starttime=$(date +%s)
@@ -102,6 +114,8 @@ verbose="true"
 imageFile="$1"
 imageMaskFile="$2"
 discard="$3"
+deskewMethod="$4"
+
 #extract filename
 fullFileName=$(basename "$imageFile") #with extension
 filename="${fullFileName##*/}" #last part of path
@@ -132,10 +146,18 @@ fi
 
 rm raw-masked.png
 
-#deskew using imagemagick built in deskew
-mogrify -deskew 40% *.png
+#deskew image using imagemagick or freds textdeskew
+for file in *.png; do
+  if [[ $deskewMethod -eq 0 ]]; then
+    convert -deskew 40% "$file" "$file"
+  elif [[ $deskewMethod -eq 1 ]]; then
+    textdeskew "$file" "$file"
+  fi
+  echo "deskewing $file"
+done
 
-#replace white border(left by deskew) to alpha
+
+#replace white border(left from deskewing) to alpha
 mogrify -bordercolor white -border 1x1 -alpha set -channel RGBA -fuzz 1% -fill none -floodfill +0+0 white -shave 1x1 *.png
 
 cd ../

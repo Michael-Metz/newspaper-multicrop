@@ -3,7 +3,7 @@
 2. [License](#license)
 3. [Set Up & Installation](#setup-and-installation)
 4. [Usage](#usage)
-5. [Differences](#differences) 
+5. [Differences](#differences)
 6. [My Workflow](#myworkflow)
 7. [Disk Considerations](#disk-considerations)
 8. [What Exactly The Script Does](#what-exactly-the-script-does)
@@ -19,7 +19,7 @@ newspaper-multicrop and newspaper-multicrop2 differ from multicrop and multicrop
 
 1. You can use a custom mask, instead of having multicrop generate a mask
 2. Borders are left transparent instead of white
- 
+
 <a name="license"></a>
 # License
 Use of newspaper-multicrop and newspaper-multicrop2 are subject, in a subordinate manner, to Fred Weinhaus's license which can be found at [http://www.fmwconcepts.com/imagemagick/](http://www.fmwconcepts.com/imagemagick/) and to the ImageMagick's license, which can be found at: [http://www.imagemagick.org/script/license.php](http://www.imagemagick.org/script/license.php)
@@ -60,7 +60,7 @@ $ sudo chmod -R +x $HOME/bin/fredscripts/
 $ cd $HOME
 $ sudo nano .profile
 ```
-`nano` opens a text editor 
+`nano` opens a text editor
 
 ##### Add to your `.profile` as seen below
 
@@ -97,9 +97,9 @@ $ sudo chmod -R +x $HOME/bin/michael-metz/
 $ cd $HOME
 $ sudo nano .profile
 ```
-`nano` opens a text editor 
+`nano` opens a text editor
 
-##### Add to your `.profile` 
+##### Add to your `.profile`
 
 ```
 #michael-metz scripts
@@ -109,30 +109,54 @@ To save and exit the text editor, type `ctrl + x` followed by `y` then hit retur
 
 <a name="usage"></a>
 
+## 4. (optional) Install Fred Weinhaus's textdeskew script
+
+since we already made the folder `fredscripts` and added it to our path, we just
+ have to download the script to `fredscripts`.
+
+##### Download the script from [freds website](http://www.fmwconcepts.com/imagemagick) ([textdeskew](http://www.fmwconcepts.com/imagemagick/textdeskew/index.php)), and move them to `$HOME/bin/fredscripts`
+```sh
+$ # Download the scripts
+$ wget http://www.fmwconcepts.com/imagemagick/textdeskew/textdeskew
+$
+$ # Move them into folder
+$ mv textdeskew $HOME/bin/fredscripts/
+```
+##### Make the script executable
+```sh
+$ sudo chmod -R +x $HOME/bin/fredscripts/
+```
+
 # Usage
-### newspaper-multicrop 
-newspaper-multicrop seperates images using multicrop and requires 3 parameters
+### newspaper-multicrop
+newspaper-multicrop separates images using multicrop requires 4 parameters
 
 1. image
 2. image mask (See *[Creating a Mask](#create-a-mask)* )
 3. grid value(*Integer value 0 < gv < 100 passed to multicrop*)
+4. deskew method (*Integer value either 0 or 1*)
+    * 0: deskew; imagemagicks built in deskew; *faster*"
+    * 1: textdeskew; Fred Weinhaus script must be installed; *slower but better*"
 
 ```sh
-$ #newspaper-multicrop [image] [image mask] [grid value]
-$ newspaper-multicrop clippings.tif clippings_mask.png 10
+$ #newspaper-multicrop [image] [image mask] [grid value] [deskew-method]
+$ newspaper-multicrop clippings.tif clippings_mask.png 10 0
 ```
 
 
 ### newspaper-multicrop2
-newspaper-multicrop2 seperates images using multicrop2 and requires requires 3 parameters
+newspaper-multicrop2 separates images using multicrop2 and requires requires 4 parameters
 
 1. image
 2. image mask (See *[Creating a Mask](#create-a-mask)* )
 3. discard value(*Integer value 0 < dv passed to multicrop2*)
+4. deskew method (*Integer value either 0 or 1*)
+    * 0: deskew; imagemagicks built in deskew; *faster*"
+    * 1: textdeskew; Fred Weinhaus script must be installed; *slower but better*"
 
 ```sh
-$ #newspaper-multicrop2 [image] [image mask] [discard value]
-$ newspaper-multicrop2 clippings.tif clippings_mask.png 800
+$ #newspaper-multicrop2 [image] [image mask] [discard value] [deskew-method]
+$ newspaper-multicrop2 clippings.tif clippings_mask.png 800 0
 ```
 
 <a name="differences"></a>
@@ -145,11 +169,27 @@ $ newspaper-multicrop2 clippings.tif clippings_mask.png 800
 
 
 
-**[multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php)** works by thresholding the image(making it black and white) then searches the image for white pixels (white = a object that stands out from background). Search points are generate by the *grid value*( gv=10, searches every 10% of the image). 
+**[multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php)** works by thresholding the image(making it black and white) then searches the image for white pixels (white = a object that stands out from background). Search points are generate by the *grid value*( gv=10, searches every 10% of the image).
 
 **[multicrop2](http://www.fmwconcepts.com/imagemagick/multicrop2/index.php)** works by thresholding the image(making it black and white) then searches the **ENTIRE** image for white pixels (white = a object that stands out from background) Then discards all the objects that are smaller then the *discard value* you specified.
 
 From my experience newspaper-multicrop2 tends to process faster.
+
+### deskew vs textdeskew
+
+**[deskew](https://www.imagemagick.org/script/command-line-options.php#deskew)**
+is faster and is already built into ImageMagick.
+
+**[textdeskew](http://www.fmwconcepts.com/imagemagick/textdeskew/index.php)**
+is significantly slower but should yield better results. This is not built intro
+imagemagick and requires additional configuration (*see step 4 of the installation*).
+Sometimes `textdeskew` outputs images that are the wrong orientation.  From my experience
+these images are still aligned, so after the script runs, a simple rotation of 90
+degrees should do.
+For more information on how `textdeskew` works read the
+**[documentation on Fred Weinhaus's website](http://www.fmwconcepts.com/imagemagick/textdeskew/index.php)**.
+
+
 <a name="myworkflow"></a>
 # My Workflow
 ## 1. Scanning
@@ -194,7 +234,7 @@ Say you have `image.tif` that contains 5 news clipping
 
 you've created a mask for it `image_mask.gif`
 
-you've put both of this files in a folder `my-scans` 
+you've put both of this files in a folder `my-scans`
 
 ```
 +---my-scans
@@ -205,7 +245,7 @@ you've put both of this files in a folder `my-scans`
 Running the following command in `my-scans` directory
 
 ```sh
-$ newspaper-multicrop image.tif image_mask.gif 10
+$ newspaper-multicrop image.tif image_mask.gif 10 0
 ```
 The script will do its thing and create a directory `image_cropped` to store all the crops
 
@@ -224,7 +264,14 @@ The script will do its thing and create a directory `image_cropped` to store all
 
 # Disk Considerations
 
-multicrop and multicrop2 write cache files to the disk.  For example a 600 dpi scan (6000x8000) resulted in around 1 gigabyte of cache files.  Therefore I would suggest running these scripts on a ram disk. Espically if your system only has a solid state drive, due to the limited write endurance of NAND based flash memory
+**[multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php)**,
+**[multicrop2](http://www.fmwconcepts.com/imagemagick/multicrop2/index.php)**,
+and,
+**[textdeskew](http://www.fmwconcepts.com/imagemagick/textdeskew/index.php)**
+ write cache files to the disk.  For example a 600 dpi scan (6000x8000) resulted
+  in around 1 gigabyte of cache files.  Therefore I would suggest running these
+   scripts on a ram disk. Especially if your system only has a solid state drive,
+    due to the limited write endurance of NAND based flash memory
 
 
 <a name="what-exactly-the-script-does"></a>
@@ -232,6 +279,6 @@ multicrop and multicrop2 write cache files to the disk.  For example a 600 dpi s
 # What the scripts does
 1. Applys image mask to raw image creating a image with a transparent background
 2. Executes Freds multicrop script with the transparent image
-3. Derotates all the cropped images(result of freds multicrop script)
-4. Converts the white background(left over from deroating) to transparent 
+3. Deskews all the cropped images(result of freds multicrop script)
+4. Converts the white background(left over from deroating) to transparent
 5. Trims extra transparent border
