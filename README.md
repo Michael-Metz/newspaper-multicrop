@@ -5,7 +5,8 @@
 4. [Usage](#usage)
 5. [Differences](#differences) 
 6. [My Workflow](#myworkflow)
-7. [What Exactly The Script Does](#what-exactly-the-script-does)
+7. [Disk Considerations](#disk-considerations)
+8. [What Exactly The Script Does](#what-exactly-the-script-does)
 
 <a name="introduction"></a>
 # Introduction
@@ -219,6 +220,12 @@ The script will do its thing and create a directory `image_cropped` to store all
        +--image-03.png
        +--image-04.png
 ```
+<a name="disk-considerations"></a>
+
+# Disk Considerations
+
+multicrop and multicrop2 write cache files to the disk.  For example a 600 dpi scan (6000x8000) resulted in around 1 gigabyte of cache files.  Therefore I would suggest running these scripts on a ram disk. Espically if your system only has a solid state drive, due to the limited write endurance of NAND based flash memory
+
 
 <a name="what-exactly-the-script-does"></a>
 
