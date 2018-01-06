@@ -183,7 +183,7 @@ Masks indicate what parts of the image is a newspaper clippings and what part is
 
 #### With Multicrop
 ```sh
-$ mulitcrop -f 15 -p 5 -m output image.tif
+$ mulitcrop -f 15 -p 5 -m output image.tif output-mask.gif
 ```
 The flag values `-f 15` & `-p 5`  work for my test scans. Reading the documentation for [multicrop](http://www.fmwconcepts.com/imagemagick/multicrop/index.php) will help different cases
 
