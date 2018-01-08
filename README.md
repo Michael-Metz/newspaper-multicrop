@@ -184,8 +184,7 @@ is faster and is already built into ImageMagick.
 is significantly slower but should yield better results. This is not built intro
 imagemagick and requires additional configuration (*see step 4 of the installation*).
 Sometimes `textdeskew` outputs images that are the wrong orientation.  From my experience
-these images are still aligned, so after the script runs, a simple rotation of 90
-degrees should do.
+running `textdeskew` manually on the "wrong orientation" image will do the trick.
 For more information on how `textdeskew` works read the
 **[documentation on Fred Weinhaus's website](http://www.fmwconcepts.com/imagemagick/textdeskew/index.php)**.
 
