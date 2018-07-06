@@ -8,6 +8,10 @@ convert -bordercolor white -border 1x1 -alpha set -channel RGBA -fuzz 1% -fill n
 #### Crop out extra transparent border pixels
 ```
 convert -bordercolor none -border 10x10 -trim +repage [infile] [outfile]
+
+or
+
+mogrify -bordercolor none -border 10x10 -trim +repage *.png
 ```
 #### Split an image 
 [https://unix.stackexchange.com/questions/169534/how-to-split-an-image-vertically-using-the-comand-line](https://unix.stackexchange.com/questions/169534/how-to-split-an-image-vertically-using-the-comand-line)
