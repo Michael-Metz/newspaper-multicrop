@@ -15,3 +15,10 @@ mogrify -bordercolor none -border 10x10 -trim +repage *.png
 ```
 #### Split an image 
 [https://unix.stackexchange.com/questions/169534/how-to-split-an-image-vertically-using-the-comand-line](https://unix.stackexchange.com/questions/169534/how-to-split-an-image-vertically-using-the-comand-line)
+
+
+## Resize all images in current directory to 300dpi. (Careful this will overwrite the original file)
+
+```
+for file in *;  do convert -resample 300 "$file" "$file"; done
+```
