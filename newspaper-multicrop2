@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# Developed by Michael Metz 8/10/2017
+# Developed by Michael Metz 2018/08/10
+# Last Modified 2018/12/16
 #
 # ------------------------------------------------------------------------------
 #
@@ -146,10 +147,16 @@ fi
 
 rm raw-masked.png
 
+#add extra transparent border so floodfill in next couple of steps will not consume the entire image.
+for file in *.png; do
+    convert "$file" -bordercolor none -border 50x50 "$file"
+done
+
 #deskew image using imagemagick or freds textdeskew
+#2018-12-16 added '-bordercolor transparent' so no white border is left after deskew
 for file in *.png; do
   if [[ $deskewMethod -eq 0 ]]; then
-    convert -deskew 40% "$file" "$file"
+    convert -background transparent -deskew 40% "$file" "$file"
   elif [[ $deskewMethod -eq 1 ]]; then
     textdeskew "$file" "$file"
   fi
@@ -158,8 +165,18 @@ done
 
 
 #replace white border(left from deskewing) to alpha
-mogrify -bordercolor white -border 1x1 -alpha set -channel RGBA -fuzz 1% -fill none -floodfill +0+0 white -shave 1x1 *.png
-
+#2018-12-16 added "-compose copy" because on transparent images
+#if you dont have ^ then it will fill the entire background with that color
+#this white will be filled and then on the next step the entire newspaper article
+#will be consumed.
+#
+#see "Border and Alpgha Compostion" @ http://www.imagemagick.org/Usage/crop/#border
+#
+if [[ $deskewMethod -eq 1 ]]; then
+    for file in *.png; do
+        convert -bordercolor white -compose copy -border 1x1 -alpha set -channel RGBA -fuzz 99% -fill none -floodfill +0+0 white -blur 0x1 -shave 1x1 "$file" "$file"
+    done
+fi
 cd ../
 
 #Use imagemagick to get rid of any extra Alpha Border. (on all images)
